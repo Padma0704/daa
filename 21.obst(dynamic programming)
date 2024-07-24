@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <limits.h>
+
+// Function to calculate the minimum cost of the Optimal Binary Search Tree
+void optimalBST(int keys[], int freq[], int n) {
+    int i, j, k, l;
+    int cost[n][n];
+    int root[n][n];
+    
+    // Initialize cost and root tables
+    for (i = 0; i < n; i++) {
+        cost[i][i] = freq[i];
+        root[i][i] = i;
+        for (j = i + 1; j < n; j++) {
+            cost[i][j] = INT_MAX;
+            root[i][j] = -1;
+        }
+    }
+    
+    // Fill the cost and root tables
+    for (l = 2; l <= n; l++) { // l is the length of the chain
+        for (i = 0; i <= n - l; i++) {
+            j = i + l - 1;
+            cost[i][j] = INT_MAX;
+            for (k = i; k <= j; k++) {
+                int c = (k > i ? cost[i][k - 1] : 0) + (k < j ? cost[k + 1][j] : 0) + getSum(freq, i, j);
+                if (c < cost[i][j]) {
+                    cost[i][j] = c;
+                    root[i][j] = k;
+                }
+            }
+        }
+    }
+
+    // Print the cost and root tables
+    printf("Cost Table:\n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            if (cost[i][j] == INT_MAX) {
+                printf("INF\t");
+            } else {
+                printf("%d\t", cost[i][j]);
+            }
+        }
+        printf("\n");
+    }
+    
+    printf("\nRoot Table:\n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            printf("%d\t", root[i][j]);
+        }
+        printf("\n");
+    }
+
+    printf("\nOptimal Cost: %d\n", cost[0][n - 1]);
+}
+
+// Function to calculate sum of frequencies from i to j
+int getSum(int freq[], int i, int j) {
+    int sum = 0;
+    for (int k = i; k <= j; k++) {
+        sum += freq[k];
+    }
+    return sum;
+}
+
+int main() {
+    int n;
+    printf("Enter the number of keys: ");
+    scanf("%d", &n);
+
+    int keys[n], freq[n];
+    printf("Enter the keys:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &keys[i]);
+    }
+
+    printf("Enter the frequencies:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &freq[i]);
+    }
+
+    optimalBST(keys, freq, n);
+
+    return 0;
+}
